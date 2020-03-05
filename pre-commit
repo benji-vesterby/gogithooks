@@ -14,23 +14,21 @@ gofiles=$(git diff --cached --name-only --diff-filter=ACM | grep '\.go$')
 
 [ -z "$gofiles" ] && exit 0
 
+# Format ALL of the unformatted files automatically
 unformatted=$(gofmt -l $gofiles)
-
-[ -z "$unformatted" ] && exit 0
-
-# Some files are not gofmt'd. Print message and fail.
-
 echo >&2 "Formatting go files in this commit."
 for fn in $unformatted; do
 	echo >&2 "formatting $PWD/$fn"
 	gofmt -s -w $PWD/$fn
-	
+    git add $PWD/$fn
+done
+
+# Execute golint and 'go vet' against the files in the commit
+for fn in $gofiles; do
 	if golint -set_exit_status $PWD/$fn
   		then
-    			if go vet $PWD
+    			if ! go vet $PWD/...
       				then
-        				git add $PWD/$fn
-      				else
         				echo "go vet failure, correct errors"
 					exit 1
       				fi
