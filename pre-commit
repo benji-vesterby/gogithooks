@@ -23,17 +23,10 @@ for fn in $unformatted; do
     git add $PWD/$fn
 done
 
-# Execute golint and 'go vet' against the files in the commit
-for fn in $gofiles; do
-	if golint -set_exit_status $PWD/$fn
-  		then
-    			if ! go vet $PWD/...
-      				then
-        				echo "go vet failure, correct errors"
-					exit 1
-      				fi
-  		else
-    			echo "golint failure, correct errors"
-			exit 1
-  		fi
-done
+# LINTER HERE
+
+if ! go vet $PWD/...
+then
+	echo "go vet failure, correct errors"
+	exit 1
+fi
