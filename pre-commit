@@ -24,6 +24,9 @@ for fn in $unformatted; do
 done
 
 # LINTER HERE
+for fn in $gofiles;
+# LINTER HERE
+done
 
 if ! go vet $PWD/...
 then
