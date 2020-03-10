@@ -36,9 +36,8 @@ if [ ${has_error} -ne 0 ]; then
     exit 1
 fi
 
-
-if ! go vet $PWD/...
-then
+go vet -race $PWD/...
+if [ $? -ne 0 ]; then
 	echo "go vet failure, correct errors"
 	exit 1
 fi
