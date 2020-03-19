@@ -31,13 +31,14 @@ for file in ${gofiles}; do
     fi
 done
 
-if [ ${has_error} -ne 0 ]; then
-    echo "One or more linter errors. Fix them and try again."
-    exit 1
-fi
+for file in ${gofiles}; do
+    go vet -race ${file}
+    if [ $? -ne 0 ]; then
+        has_error=1
+    fi
+done
 
-go vet -race $PWD/...
-if [ $? -ne 0 ]; then
-	echo "go vet failure, correct errors"
-	exit 1
+if [ ${has_error} -ne 0 ]; then
+    echo "One or more errors. Fix them and try again."
+    exit 1
 fi
