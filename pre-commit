@@ -23,6 +23,11 @@ for fn in $unformatted; do
     git add $PWD/$fn
 done
 
+which golint>/dev/null 2>&1
+if [ $? -ne 0 ]; then
+	go get -u github.com/x/lint/golint
+fi
+
 has_error=0
 for file in ${gofiles}; do
     golint -set_exit_status ${file}
@@ -41,3 +46,41 @@ if [ $? -ne 0 ]; then
 	echo "go vet failure, correct errors"
 	exit 1
 fi
+
+which misspell>/dev/null 2>&1
+if [ $? -ne 0 ]; then
+	go get -u github.com/client9/misspell/cmd/misspell
+fi
+
+# this is setup to fail the commit due to misspellings
+misspell -error ./...
+
+which ineffassign>/dev/null 2>&1
+if [ $? -ne 0 ]; then
+	go get -u github.com/gordonklaus/ineffassign
+fi
+
+ineffassign .
+
+which errcheck>/dev/null 2>&1
+if [ $? -ne 0 ]; then
+	go get -u github.com/kisielk/errcheck
+fi
+
+errcheck ./...
+
+which gosec>/dev/null 2>&1
+if [ $? -ne 0 ]; then
+	go get -u github.com/securego/gosec/cmd/gosec
+fi
+
+# This is setup to NOT fail a commit. Just informational for now.
+gosec -no-fail -quiet ./...
+
+which staticcheck>/dev/null 2>&1
+if [ $? -ne 0 ]; then
+	go get -u honnef.co/go/tools/cmd/staticcheck 
+fi
+
+# This is setup to NOT fail a commit. Just informational for now.
+staticcheck -tests=0 -fail ./...
