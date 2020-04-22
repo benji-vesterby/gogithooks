@@ -53,13 +53,15 @@ if [ $? -ne 0 ]; then
 fi
 
 # this is setup to fail the commit due to misspellings
-misspell -error ./...
+echo "executing misspell"
+misspell -error .
 
 which ineffassign>/dev/null 2>&1
 if [ $? -ne 0 ]; then
 	go get -u github.com/gordonklaus/ineffassign
 fi
 
+echo "executing ineffassign"
 ineffassign .
 
 which errcheck>/dev/null 2>&1
@@ -67,6 +69,7 @@ if [ $? -ne 0 ]; then
 	go get -u github.com/kisielk/errcheck
 fi
 
+echo "executing errcheck"
 errcheck ./...
 
 which gosec>/dev/null 2>&1
@@ -75,6 +78,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # This is setup to NOT fail a commit. Just informational for now.
+echo "executing gosec"
 gosec -no-fail -quiet ./...
 
 which staticcheck>/dev/null 2>&1
@@ -83,6 +87,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # This is setup to NOT fail a commit. Just informational for now.
+echo "executing staticcheck"
 staticcheck -tests=0 -fail ./...
 
 go mod tidy
